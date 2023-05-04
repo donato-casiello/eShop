@@ -16,11 +16,12 @@
             </div>
             <!-- Main Form -->
             <div class="col-md-7 mb-4">
-                <form action="{% url 'checkout' %}" method="post">
+                <form action="{% url 'create_checkout_session' %}" method="POST">
                     {% csrf_token %}
                     {{ form | crispy }}
                     <hr>
-                    <button class="btn btn-primary" type="submit">Continue Checkout</button>
+                    <input type="hidden" name="order-id" value="{{ order.id }}">
+                    <button class="btn btn-primary" id="checkout-button" type="submit">Continue Checkout</button>
                 </form>
             </div>
             <!-- Order summary -->

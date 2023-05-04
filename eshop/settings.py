@@ -12,20 +12,39 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 
 from pathlib import Path
+import environ
+from django.core.exceptions import ImproperlyConfigured
 
+env = environ.Env()
+environ.Env.read_env()
+
+def get_env_variable(var_name):
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "set the %s environment variable" % var_name
+        raise ImproperlyConfigured(error_msg)
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# Set the project base directory
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# False if not in os.environ because of casting above
+DEBUG=env('DEBUG')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-!^)mb@sj)=-!(o-f*ydn@k%2wu6c(b&ap!b@x$y&1ngz3$x-tb"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Raises Django's ImproperlyConfigured
+# exception if SECRET_KEY not in os.environ
+SECRET_KEY=env('SECRET_KEY')
 
 ALLOWED_HOSTS = []
 
@@ -138,3 +157,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Crispy forms
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+# Stripe keys
+STRIPE_PUBLIC_KEY=env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY=env('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET=env("STRIPE_WEBHOOK_SECRET")
