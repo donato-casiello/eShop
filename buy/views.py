@@ -175,10 +175,8 @@ class profilePage(LoginRequiredMixin, View):
         form = EditProfileForm(self.request.POST or None, self.request.FILES or None)
         # Get the data from edit profile form
         if form.is_valid():
-            print("FORM IS VALID")
             # User already has an account
             try:
-                print("ACCOUNT EXISTS")
                 account = Account.objects.get(user=self.request.user)
                 # Update profile image
                 if form.cleaned_data["profile_image"] != None:
@@ -192,12 +190,9 @@ class profilePage(LoginRequiredMixin, View):
                 account.state = form.cleaned_data.get("state")
                 account.birthday = form.cleaned_data.get("birthday")
                 account.save()
-                print("ACCOUNT UPDATE")
-                messages.success(self.request, "Profile updated correctly")
                 return redirect("profile", username=self.request.user.username)
             # User doesn't has an account
             except ObjectDoesNotExist:
-                print("ACCOUNT DOESN'T EXISTS")
                 profile_image = form.cleaned_data["profile_image"]
                 first_name = form.cleaned_data.get("first_name")
                 last_name = form.cleaned_data.get("last_name")
@@ -217,7 +212,6 @@ class profilePage(LoginRequiredMixin, View):
                     birthday = birthday
                 )
                 new_account.save()
-                messages.success(self.request, "Profile updated correctly")
                 return redirect("profile", username=self.request.user.username)
         else:
             messages.error(self.request, "Something went wrong")
