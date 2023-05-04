@@ -1,0 +1,127 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{% block title %}{% endblock title %}</title>
+        <!-- Favicon-->
+
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- CSS-->
+        <link rel="stylesheet" type="text/css" href="{% static 'buy/styles.css' %}" />
+        <!-- Google Fonts -->
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        {% block nav %}
+        <!-- Navigation -->
+        {% load cart_template_tags  %}
+        <nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="{% url 'home' %}">eShop</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Category</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'category' 'Digital Services' %}">Digital Services</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Wear' %}">Wear</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Cosmetic and Body Care' %}">Cosmetic and Body Care</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Furniture and Decor' %}">Furniture and Decor</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Household Items' %}">Household items</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Media' %}">Media</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Pet Care' %}">Pet Care</a></li>
+                                <li><a class="dropdown-item" href="{% url 'category' 'Office equipment' %}">Office equipment</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <!-- Rightside navigation-->
+                    {% if request.user.is_authenticated %}
+                        <button class="btn btn-outline-dark" type="submit">
+                            <a href="{% url 'order-summary' %}" class="d-flex align-items-center nav-link">
+                                <i class="bi-cart-fill me-1"></i>
+
+                                <span class=" ms-1 badge rounded-pill bg-danger">{{ request.user | cart_item_count }}</span>
+                            </a>
+                        </button>
+                        <button class="btn btn-outline-dark mx-3">
+                            <a href="{% url 'profile' request.user.username %}" class="nav-link"><i class="bi bi-person"></i></a>
+                        </button>
+                        <button class="btn btn-outline-dark mx-3">
+                            <a href="{% url 'account_logout' %}" class="nav-link">Logout</a>
+                        </button>
+                    {% else %}
+                    <form class="d-flex">
+                        <a href="{% url 'account_login' %}" class="nav-link mx-3">Login</a>
+                    </form> 
+                    <form class="d-flex">
+                        <a href="{% url 'account_signup' %}" class="nav-link">Register</a>
+                    </form> 
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="my-4 pt-5">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        {% endblock %}
+                
+        {% block content %}
+        {% endblock %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                    <li class="page-link active">{{ page_obj.number }}</li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }} ">Next</a></li>
+                {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+          
+        <!-- Footer-->
+        <footer class="bg-dark mt-auto py-3">
+            <div class="container d-flex justify-content-evenly">
+                <p class="m-0 text-center text-white">&copy; DC</p>
+                <div class="d-flex justify-content-evenly" id="social">
+                    <i class="bi bi-facebook ms-3"></i>
+                    <i class="bi bi-linkedin ms-3"></i>
+                    <i class="bi bi-telegram ms-3"></i>
+                    <i class="bi bi-instagram ms-3"></i>
+                    <i class="bi bi-github ms-3"></i>
+                </div>
+            </div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Custom JS -->
+        <script src="{% static 'buy/script.js' %}"></script>
+    </body>
+</html>

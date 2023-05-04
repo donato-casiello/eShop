@@ -1,0 +1,111 @@
+{% extends 'buy/layout.html' %}
+
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+
+<main class="mt-2 pt-3">
+    <div class="container mt-5">
+        <!--Grid row-->
+        <div class="row">
+
+            <div class=" d-flex justify-content-center col-md-6 mb-4">
+                {% if object.image %}
+                <img src="{{ object.image.url }}" class="img-fluid" alt="" />
+                {% else %}
+                <img src="/media/images.png" class="img-fluid" alt="" />
+                {% endif %}
+            </div>
+
+            <!--Grid column-->
+            <div class="col-md-6 mb-4">
+                <!--Content-->
+                <div class="p-4">
+                    <h3 class="p-3 text-center">{{ object.title }}</h3>
+                    <div class="mb-3">
+                        <a href="#">
+                            <span class="badge bg-{{ object.label }} me-1">{{ object.get_label_display }}</span>
+                        </a>
+                    </div>
+
+                    <p class="lead">
+                        {% if object.discount_price %}
+                            <span class="me-1">
+                                <del>${{ object.price }}</del>
+                            </span>
+                            <span><b>${{ object.discount_price }}</b></span>
+                        {% else %}
+                            <span>${{ object.price }}</span>
+                        {% endif %}
+                    </p>
+
+
+                    <p>{{ object.description }}</p>
+                    <a class="btn btn-primary ms-1" href="{{ object.add_to_cart_url }}">
+                        Add to cart
+                        <i class="fas fa-shopping-cart ms-1"></i>
+                    </a>
+                    <a class="btn btn-secondary ms-1" href="{{ object.remove_from_cart_url }}">
+                        Remove from  cart
+                        <i class="fas fa-shopping-cart ms-1"></i>
+                    </a>
+                </div>
+                <!--Content-->
+            </div>
+            <!--Grid column-->
+        </div>
+        <!--Grid row-->
+
+        <hr >
+
+        <!--Grid row-->
+        <div class="row d-flex justify-content-center">
+            <!--Grid column-->
+            <div class="col-md-6 text-center">
+                <h4 class="my-4 h4">Additional information</h4>
+
+                <p>{{ object.additional_information }}</p>
+            </div>
+            <!--Grid column-->
+        </div>
+        <!--Grid row-->
+
+        <!--Grid row-->
+        <div class="row m-3">
+            <!--Grid column-->
+            <div class="col-lg-4 col-md-12 mb-4">
+                {% if object.a_image1 %}
+                <img src="{{ object.a_image1.url }}" class="img-fluid" alt="additional image 1" height="250px" width="200px"/>
+                {% endif %}
+            </div>
+            <!--Grid column-->
+
+            <!--Grid column-->
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                {% if object.a_image2 %}
+                <img src="{{ object.a_image2.url }}" class="img-fluid" alt="additional image 2" height="250px" width="200px"/>
+                {% endif %}
+            </div>
+            
+            <!--Grid column-->
+
+            <!--Grid column-->
+            <div class="col-lg-4 col-md-6 mb-4">
+                {% if object.a_image3 %}
+                <img src="{{ object.a_image3.url }}" class="img-fluid" alt="additional image 3" height="250px" width="200px"/>
+                {% endif %}
+            </div>
+            <!--Grid column-->
+        </div>
+        <!--Grid row-->
+    </div>
+</main>
+<!--Main layout-->
+
+
+</body>
+</html>
+
+{% endblock %}

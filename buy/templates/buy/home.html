@@ -1,0 +1,52 @@
+{% extends "buy/layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        {% for item in object_list%}
+        <div class="col mb-5">
+            <div class="card h-100">
+                <!-- Sale badge-->
+                <div class="badge bg-{{item.label}} text-white position-absolute" style="top: 0.5rem; right: 0.5rem">{{ item.get_label_display }}</div>
+                <!-- Product image-->
+                <a class="nav-link" href="{{ item.get_absolute_url }}">
+                    {% if item.image %}
+                    <img class="card-img-top border" src="{{ item.image.url }}" alt="Product image" height="250px" width="200px" />
+                    {% else %}
+                    <img class="card-img-top" src="/media/images.png" alt="Product image" height="250px" width="200px"/>
+                    {% endif %}
+                </a>
+                <!-- Product details-->
+                <div class="card-body p-4">
+                    <div class="text-center">
+                        <!-- Product name-->
+                        <h5 class="fw-bolder">
+                            <a class="nav-link" href="{{ item.get_absolute_url }}">
+                            {{ item.title }}
+                            </a>
+                        </h5>
+                        <!-- Product category -->
+                        <div class="d-flex justify-content-center small mb-2">{{ item.get_category_display }}</div>
+                        <!-- Product price-->
+                        <span class="text-muted">
+                            {% if item.discount_price %}
+                                ${{ item.discount_price }}
+                            {% else %}
+                                ${{ item.price }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <!-- Product actions-->
+                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
