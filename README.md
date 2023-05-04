@@ -1,7 +1,7 @@
 # eShop
 eShop is a e-commerce site designed in Django  that allow users to buy a different kind of products, grouped into categories. Payments are managed by Stripe.
 
-## SPECIFICATION
+## SPECIFICATIONS
 * **Home**: are shown all the products, paginated by 10, in chronological order (latest product insert into database is on the top);
 * **Product** detail: clicking on product image or title, the users are redirect to product detail page that shows the main image, other images, product price and product discount price (if exists), title, brief description and additional informations;
 * **Category**: users can search a specific category of products;
