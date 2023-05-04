@@ -6,11 +6,20 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import CheckoutForm, EditProfileForm
 
 from .models import Item, OrderItem, Order, BillingAddress, Account
+
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+
+
 
 # Home view
 class HomeView(ListView):
@@ -95,8 +104,7 @@ def removeSingleItemFromCart(request, slug):
             order_item = OrderItem.objects.filter(
                 item=item, 
                 user=request.user, 
-                ordered=False
-            )[0] 
+                ordered=False)[0] 
             if order_item.quantity > 1:
                 order_item.quantity -= 1
                 order_item.save() 
@@ -122,51 +130,6 @@ class OrderSummaryView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.error(self.request, "You don't have an active order")
             return redirect("/")
-
-# Checkout view
-class CheckoutView(LoginRequiredMixin, View):
-    def get(self, *args, **kwargs):
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-        except ObjectDoesNotExist:
-            messages.error(self.request, "You don't have an active order")
-            return redirect("buy/order_summary.html")
-        # Form
-        form = CheckoutForm()
-        context = {
-            "form" : form,
-            "order" : order,
-        }
-        return render(self.request, 'buy/checkout.html', context)
-    
-    def post(self, *args, **kwargs): 
-        form = CheckoutForm(self.request.POST or None)
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            if form.is_valid():
-                street_address = form.cleaned_data.get('street_address')
-                apartment_address = form.cleaned_data.get('apartment_address')
-                country = form.cleaned_data.get('country')
-                cap = form.cleaned_data.get('cap')
-                payment_option = form.cleaned_data.get('payment_option')
-                billign_address = BillingAddress(
-                    user = self.request.user, 
-                    street_address = street_address, 
-                    apartment_address = apartment_address, 
-                    country = country, 
-                    cap = cap, 
-                )
-                billign_address.save()
-                order.billing_address = billign_address
-                order.save()
-                print("form valid")
-                return redirect("payment")
-            else:
-                messages.warning(self.request, "Failed checkout")
-                return redirect("checkout")
-        except ObjectDoesNotExist:
-            messages.error(self.request, "You don't have an active order")
-            return redirect("buy/order_summary.html")
         
 # Profile page
 class profilePage(LoginRequiredMixin, View):
@@ -249,3 +212,104 @@ class profilePage(LoginRequiredMixin, View):
         else:
             messages.error(self.request, "Something went wrong")
             return redirect("profile", username=self.request.user.username)
+        
+# Checkout session to handle payment with stripe
+
+class Create_Checkout_Session(LoginRequiredMixin, View):
+
+    def post(self, *args, **kwargs):
+        order_id = self.request.POST.get('order-id')
+        order = Order.objects.get(user=self.request.user, id=order_id)
+        YOUR_DOMAIN = "http://127.0.0.1:8000/buy/"
+        host = self.request.get_host()
+        print(order.get_total())
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types = ["card"],
+                    line_items=[
+                        {
+                            "price_data" : {
+                                "currency" : "eur",
+                                "unit_amount" : int(order.get_total()) * 100,
+                                "product_data" : {
+                                    "name" : order.id,
+                                }
+                                },
+                            "quantity" : 1,
+                        }
+                    ],
+                    mode='payment',
+                    success_url=YOUR_DOMAIN + 'success/',
+                    cancel_url=YOUR_DOMAIN + 'cancel/',
+                )
+        return redirect(checkout_session.url, code=303)
+
+    def get(self, *args, **kwargs):
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            # Form
+            form = CheckoutForm()
+            context = {
+                "form" : form,
+                "order" : order,
+            }
+            return render(self.request, 'buy/checkout.html', context)
+
+def success(request):
+    context = {
+        "payment_status" : 'success'
+        }
+    return render(request, "buy/success.html", context)
+
+def cancel(request):
+    context = {
+        "payment_status" : 'cancel'
+        }
+    return render(request, "buy/cancel.html", context)
+
+
+# Using Django
+
+
+@csrf_exempt
+def my_webhook_view(request):
+  payload = request.body
+  sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+  event = None
+
+  try:
+    event = stripe.Webhook.construct_event(
+      payload, sig_header, endpoint_secret
+    )
+  except ValueError as e:
+    # Invalid payload
+    return HttpResponse(status=400)
+  except stripe.error.SignatureVerificationError as e:
+    # Invalid signature
+    return HttpResponse(status=400)
+
+  # Handle the checkout.session.completed event
+  if event['type'] == 'checkout.session.completed':
+    # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+    session = stripe.checkout.Session.retrieve(
+      event['data']['object']['id'],
+      expand=['line_items'],
+    )
+
+    if session.payment_status == "paid":
+        # Fulfill the purchase...
+        line_items = session.list_line_items(session.id, limit=1).data[0]
+        order_id = line_items['description']
+        fulfill_order(order_id)
+
+  # Passed signature verification
+  return HttpResponse(status=200)
+
+def fulfill_order(order_id):
+    print("RUN FULFILL FUNCTION")
+    order = Order.objects.get(id=order_id)
+    ordered_items = order.items.all()
+    for item in ordered_items:
+        item.ordered = True
+        item.save()
+    order.ordered = True
+    order.ordered_date = datetime.datetime.now()
+    order.save()
