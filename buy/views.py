@@ -41,6 +41,16 @@ def categoryList(request, category):
     }
     return render(request, "buy/category.html", context)
 
+def search(request):
+    if request.method == "POST":
+        query = request.POST["query"]
+        item_list = Item.objects.filter(title__contains=query)
+        context = {
+         "item_list" : item_list,
+         "query" : query, 
+        }
+        return render(request, "buy/search.html", context)
+
 # Add item to cart
 @login_required
 def addToCart(request, slug):

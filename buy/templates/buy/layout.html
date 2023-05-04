@@ -43,7 +43,15 @@
                                 <li><a class="dropdown-item" href="{% url 'category' 'Office equipment' %}">Office equipment</a></li>
                             </ul>
                         </li>
+                        <div class="" role="search">
+                            <form class="d-flex ms-5" action="{% url 'search'  %}" method="POST">
+                                {% csrf_token %}
+                                <input name="query" class="form-control mx-2" type="text">
+                                <input type="submit" class="btn btn-outline-primary" value="Search">
+                            </form>
+                        </div>
                     </ul>
+                    
                     <!-- Rightside navigation-->
                     {% if request.user.is_authenticated %}
                         <button class="btn btn-outline-dark" type="submit">
