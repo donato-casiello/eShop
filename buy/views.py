@@ -220,7 +220,7 @@ class Create_Checkout_Session(LoginRequiredMixin, View):
     def post(self, *args, **kwargs):
         order_id = self.request.POST.get('order-id')
         order = Order.objects.get(user=self.request.user, id=order_id)
-        YOUR_DOMAIN = "http://127.0.0.1:8000/buy/"
+        host = self.request.get_host()
         host = self.request.get_host()
         print(order.get_total())
         checkout_session = stripe.checkout.Session.create(
@@ -238,8 +238,8 @@ class Create_Checkout_Session(LoginRequiredMixin, View):
                         }
                     ],
                     mode='payment',
-                    success_url=YOUR_DOMAIN + 'success/',
-                    cancel_url=YOUR_DOMAIN + 'cancel/',
+                    success_url="http://{}{}".format(host, reverse(success)),
+                    cancel_url="http://{}{}".format(host, reverse(cancel)),
                 )
         return redirect(checkout_session.url, code=303)
 
@@ -264,9 +264,6 @@ def cancel(request):
         "payment_status" : 'cancel'
         }
     return render(request, "buy/cancel.html", context)
-
-
-# Using Django
 
 
 @csrf_exempt
