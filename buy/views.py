@@ -64,17 +64,17 @@ def addToCart(request, slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item.quantity += 1
             order_item.save()
-            return redirect('order-summary')
+            return redirect('/')
         else:
             messages.info(request, "This item was added to your cart.")
             order.items.add(order_item)
-            return redirect('order-summary')
+            return redirect('/')
     else:
         ordered_date = datetime.datetime.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
-        return redirect('order-summary')
+        return redirect('/')
     
 # Remove item from cart
 @login_required

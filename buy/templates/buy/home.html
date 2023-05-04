@@ -41,8 +41,13 @@
                     </div>
                 </div>
                 <!-- Product actions-->
+                <div id="overlay">
+                    <div id="modal">
+                        <button id="closeModalBtn" class="btn btn-secondary" onclick="closeModal()" >Close modal</button>
+                    </div>
+                </div>
                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ item.add_to_cart_url }}">Add to cart</a></div>
+                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" type="button" id="addToCartBtn" onclick="addToCart('{{ item.slug }}')">Add to cart</a></div>
                 </div>
             </div>
         </div>
