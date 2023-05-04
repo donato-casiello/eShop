@@ -11,7 +11,6 @@ urlpatterns = [
     path("remove-from-cart/<slug>", views.removeFromCart, name="remove-from-cart"),
     path("remove-single-item-from-cart/<slug>", views.removeSingleItemFromCart, name="remove-single-item-from-cart"),
     path("order-summary", views.OrderSummaryView.as_view(), name="order-summary"),
-    #path("checkout/", views.CheckoutView.as_view(), name="checkout"),
     path("create_checkout_session/", views.Create_Checkout_Session.as_view(), name="create_checkout_session"),
     path("profile/<str:username>/", views.profilePage.as_view(), name="profile"),
     path("success/", views.success, name="success"),
