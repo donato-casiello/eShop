@@ -82,6 +82,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "eshop.urls"
+CSRF_COOKIE_SECURE = True
 
 TEMPLATES = [
     {

@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -7,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.shortcuts import render, get_object_or_404, redirect, reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import CheckoutForm, EditProfileForm
@@ -54,27 +55,28 @@ def search(request):
 # Add item to cart
 @login_required
 def addToCart(request, slug):
-    item = get_object_or_404(Item, slug=slug)
-    order_item, created = OrderItem.objects.get_or_create(item=item, user=request.user, ordered=False) 
-    # Filter the Order objects to check if the user hasn't already send the order
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
-    if order_qs.exists():
-        order = order_qs[0]
-        # Check if the order item is in the order
-        if order.items.filter(item__slug=item.slug).exists():
-            order_item.quantity += 1
-            order_item.save()
-            return redirect('/')
+    if request.method == "POST":
+        data = json.loads(request.body)
+        item_slug = data["content"]
+        item = get_object_or_404(Item, slug=item_slug)
+        order_item, created = OrderItem.objects.get_or_create(item=item, user=request.user, ordered=False) 
+        # Filter the Order objects to check if the user hasn't already send the order
+        order_qs = Order.objects.filter(user=request.user, ordered=False)
+        if order_qs.exists():
+            order = order_qs[0]
+            # Check if the order item is in the order
+            if order.items.filter(item__slug=item.slug).exists():
+                order_item.quantity += 1
+                order_item.save()
+                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
+            else:
+                order.items.add(order_item)
+                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
         else:
-            messages.info(request, "This item was added to your cart.")
+            ordered_date = datetime.datetime.now()
+            order = Order.objects.create(user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
-            return redirect('/')
-    else:
-        ordered_date = datetime.datetime.now()
-        order = Order.objects.create(user=request.user, ordered_date=ordered_date)
-        order.items.add(order_item)
-        messages.info(request, "This item was added to your cart.")
-        return redirect('/')
+            return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
     
 # Remove item from cart
 @login_required
