@@ -41,18 +41,33 @@
                     </div>
                 </div>
                 <!-- Modal Add -->
-                <div id="overlay">
-                    <div id="modal">
-                        Added to your cart!
-                        <button id="closeModalBtn" class="btn btn-secondary" onclick="closeModal()" >Close modal</button>
+                {% if request.user.is_authenticated %}
+                    <form method="POST" action="{% url 'add-to-cart' item.slug %}">
+                        {% csrf_token %}
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" type="submit" id="addToCartBtn" onclick="addToCart('{{ item.slug }}')" data-bs-toggle="modal" data-bs-target="#addToCartModal">Add to cart</a>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+                <!-- Add to cart Modal -->
+                <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                          <b>Added to your cart</b>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <a href="{% url 'order-summary' %}" class="btn btn-dark"><i class="bi-cart-fill me-1"></i>Cart</a>
+                        </div>
+                      </div>
                     </div>
-                </div>
-                <form method="POST" action="{% url 'add-to-cart' item.slug %}">
-                    {% csrf_token %}
-                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" type="submit" id="addToCartBtn" onclick="addToCart('{{ item.slug }}')">Add to cart</a></div>
-                    </div>
-                </form>
+                  </div>
             </div>
         </div>
         {% endfor %}

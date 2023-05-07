@@ -42,10 +42,30 @@
 
 
                     <p>{{ object.description }}</p>
-                    <a class="btn btn-primary ms-1" href="{{ object.add_to_cart_url }}">
-                        Add to cart
-                        <i class="fas fa-shopping-cart ms-1"></i>
-                    </a>
+                    <form method="POST" action="{% url 'add-to-cart' object.slug %}">
+                        {% csrf_token %}
+                        <a class="btn btn-primary ms-1" onclick="addToCart('{{ object.slug }}')" data-bs-toggle="modal" data-bs-target="#addToCartModal">
+                            Add to cart
+                            <i class="fas fa-shopping-cart ms-1"></i>
+                        </a>
+                    </form>
+                    <!-- Add to cart modal -->
+                    <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                              <b>Added to your cart</b>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <a href="{% url 'order-summary' %}" class="btn btn-dark"><i class="bi-cart-fill me-1"></i>Cart</a>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
                    
                 </div>
                 <!--Content-->

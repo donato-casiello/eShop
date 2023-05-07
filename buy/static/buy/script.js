@@ -1,14 +1,8 @@
-document.addEventListener("DOMContentLoaded", function(){
-
-
-})
 
 // Show the modal to inform that the item was added to cart
 function addToCart(slug){
-    const modal = document.getElementById('overlay');   
     console.log(slug)
-    modal.style.display = "block";
-    fetch(`add-to-cart/${slug}`, {
+    fetch(`/buy/add-to-cart/${slug}`, {
         method : "POST", 
         headers : {"Content-type":"application/json", "X-CSRFToken":getCookie('csrftoken')},
         body : JSON.stringify({
