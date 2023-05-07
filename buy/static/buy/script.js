@@ -16,7 +16,15 @@ function addToCart(slug){
         })
     }) 
     .then(response => response.json())
-    .then(result => console.log(result))
+    .then(result => {console.log(result);
+        // Check if the item is in the cart or not and update the cart item count
+        console.log(result.added_to_cart);
+        if(result && result.added_to_cart === false) {
+            let cartCount = document.getElementById('cartCount');
+            let newCount = parseInt(cartCount.innerHTML) + 1;
+            cartCount.innerHTML = newCount;
+            console.log(newCount);
+        }})
 }
 
 // Close the modal

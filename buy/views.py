@@ -68,15 +68,16 @@ def addToCart(request, slug):
             if order.items.filter(item__slug=item.slug).exists():
                 order_item.quantity += 1
                 order_item.save()
-                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
+                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, "added_to_cart" : True })
             else:
                 order.items.add(order_item)
-                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
+                return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, "added_to_cart" : False })
+        # Create a new OrderItem
         else:
             ordered_date = datetime.datetime.now()
             order = Order.objects.create(user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
-            return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, })
+            return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, "added_to_cart" : False })
     
 # Remove item from cart
 @login_required
