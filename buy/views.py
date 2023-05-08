@@ -66,8 +66,6 @@ def addToCart(request, slug):
             order = order_qs[0]
             # Check if the order item is in the order
             if order.items.filter(item__slug=item.slug).exists():
-                order_item.quantity += 1
-                order_item.save()
                 return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, "added_to_cart" : True })
             else:
                 order.items.add(order_item)
@@ -78,7 +76,23 @@ def addToCart(request, slug):
             order = Order.objects.create(user=request.user, ordered_date=ordered_date)
             order.items.add(order_item)
             return JsonResponse({"message":"Add to cart successfully", "item_slug":item_slug, "added_to_cart" : False })
-    
+
+# Increase quantity in order summary
+@login_required
+def increaseQuantity(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_item, created = OrderItem.objects.get_or_create(item=item, user=request.user, ordered=False)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+            order = order_qs[0]
+            order_item.quantity += 1
+            order_item.save()
+            context = {
+                "order_item" : order_qs
+            }
+            return redirect('order-summary')
+            
+            
 # Remove item from cart
 @login_required
 def removeFromCart(request, slug):
@@ -314,3 +328,16 @@ def fulfill_order(order_id):
     order.ordered = True
     order.ordered_date = datetime.datetime.now()
     order.save()
+    
+class ordersPage(LoginRequiredMixin, View):
+     def get(self, *arg, **kwargs):
+        try:
+            orders = Order.objects.filter(user=self.request.user, ordered=True)
+            context = { 
+                "orders" : orders
+                }
+            return render(self.request, "buy/orders.html", context)
+        except ObjectDoesNotExist:
+            messages.error(self.request, "You don't have any orders")
+            return redirect("/")
+    

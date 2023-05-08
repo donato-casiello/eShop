@@ -44,7 +44,7 @@
                     <p>{{ object.description }}</p>
                     <form method="POST" action="{% url 'add-to-cart' object.slug %}">
                         {% csrf_token %}
-                        <a class="btn btn-primary ms-1" onclick="addToCart('{{ object.slug }}')" data-bs-toggle="modal" data-bs-target="#addToCartModal">
+                        <a class="btn btn-outline-primary ms-1" id="addToCartBtn" onclick="addToCart('{{ object.slug }}')" data-bs-toggle="modal" data-bs-target="#addToCartModal">
                             Add to cart
                             <i class="fas fa-shopping-cart ms-1"></i>
                         </a>

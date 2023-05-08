@@ -27,7 +27,7 @@
                     <td class="p-4">
                         <a href="{% url 'remove-single-item-from-cart' order_item.item.slug %}"><i class="bi bi-dash me-2"></i></a>
                         {{ order_item.quantity }}
-                        <a href="{% url 'add-to-cart' order_item.item.slug %}"><i class="bi bi-plus ms-2"></i></a>
+                        <a href="{% url 'increaseQuantity' order_item.item.slug %}"><i class="bi bi-plus ms-2"></i></a>
                     </td>
                     <td class="p-4">
                         {% if order_item.item.discount_price %}
@@ -36,7 +36,7 @@
                         {% else %}
                             ${{ order_item.get_total_price }}
                         {% endif %}
-                        <a style="color: red;" href="{% url 'remove-from-cart' order_item.item.slug %}"><i class="bi bi-trash float-end"></i></a>
+                        <a href="{% url 'remove-from-cart' order_item.item.slug %}"><i class="bi bi-trash float-end"></i></a>
                     </td>
                 </tr>
                 {% empty %}

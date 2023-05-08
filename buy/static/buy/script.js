@@ -14,20 +14,13 @@ function addToCart(slug){
         // Check if the item is in the cart or not and update the cart item count
         console.log(result.added_to_cart);
         if(result && result.added_to_cart === false) {
+            // Update the cartCount 
             let cartCount = document.getElementById('cartCount');
             let newCount = parseInt(cartCount.innerHTML) + 1;
             cartCount.innerHTML = newCount;
-            console.log(newCount);
-        }})
+        }
+    })
 }
-
-// Close the modal
-function closeModal(){
-    const modal = document.getElementById('overlay');   
-    console.log(modal)
-    modal.style.display = "none";
-}
-
 
 // Handle the cookies
 function getCookie(name) {
