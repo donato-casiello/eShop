@@ -11,7 +11,7 @@ eShop is a e-commerce site designed in Django  that allow users to buy a differe
 * **Order summary**: summary of what the user has added to the cart with the total to be paid;
 * **Checkout**: last step before payment, where the user must enter the information necessary for the delivery of the products;
 
-### Installation
+### Getting Started
 1. Install [python3](https://www.python.org/downloads/), [pip3](https://pip.pypa.io/en/stable/installing/)
 2. Active `v-shop` virtualenv
 3. Install dependencies from requirements.txt 
